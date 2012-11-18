@@ -12,6 +12,8 @@ from tgext.admin.controller import AdminController
 
 from rocco.lib.base import BaseController
 from rocco.controllers.error import ErrorController
+from sqlalchemy import func
+
 
 __all__ = ['RootController']
 
@@ -51,6 +53,12 @@ class RootController(BaseController):
         statistic.lat = kw['lat']
         statistic.device_id = kw['device_id']
         DBSession.add(statistic);
+
+    @expose()
+    def me(self, device_id):
+        query = DBSession.query(func.sum(model.Statistic.km)).filter(model.Statistic.device_id==device_id)
+	distance = query.scalar()
+	return str(round(distance * 1000))
 
     @expose('rocco.templates.about')
     def about(self):
